@@ -1,3 +1,7 @@
 <Solution>
+  <Project Path="Api/Api.csproj" />
+  <Project Path="Discord/Discord.csproj" Id="d5fc29dd-cc5f-4920-9ac2-a518ef0e5290" />
   <Project Path="Host/Host.csproj" />
+  <Project Path="Shared/Shared.csproj" Id="52440c03-5e93-4b81-9df2-bce7694a7598" />
+  <Project Path="Tests/Tests.csproj" Id="6dab49b1-b91a-4795-a5fb-f45936682b25" />
 </Solution>
