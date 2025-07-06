@@ -361,3 +361,12 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# DotEnv files
+.env
+
+# Aspire config files
+.aspire
+
+# Docker compose file
+docker-compose.yaml

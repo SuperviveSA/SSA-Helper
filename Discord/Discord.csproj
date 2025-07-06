@@ -6,4 +6,19 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="NetCord" Version="1.0.0-alpha.391" />
+		<PackageReference Include="NetCord.Hosting.AspNetCore" Version="1.0.0-alpha.391" />
+		<PackageReference Include="NetCord.Hosting.Services" Version="1.0.0-alpha.391" />
+		<PackageReference Include="NetCord.Services" Version="1.0.0-alpha.391" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Shared\Shared.csproj" />
+	</ItemGroup>
+
 </Project>
