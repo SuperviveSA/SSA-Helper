@@ -27,6 +27,6 @@ jobs:
             git reset --hard origin/master
 
             export ContainerRuntimeIdentifier=linux-arm64
-            aspire publish
+            /root/.dotnet/tools/aspire publish
 
             docker compose up -d --remove-orphans
