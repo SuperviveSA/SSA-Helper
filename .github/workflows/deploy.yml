@@ -20,7 +20,7 @@ jobs:
           script: |
             set -e
 
-            TARGET_DIR=/home/SSA-Helper
+            TARGET_DIR=/root/SSA-Helper/
 
             cd "$TARGET_DIR"
             git fetch --all
