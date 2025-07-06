@@ -1,0 +1,32 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host:        ${{ secrets.SSH_HOST }}
+          username:    ${{ secrets.SSH_USER }}
+          key:         ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+
+            TARGET_DIR=/home/SSA-Helper
+
+            cd "$TARGET_DIR"
+            git fetch --all
+            git reset --hard origin/master
+
+            export ContainerRuntimeIdentifier=linux-arm64
+            aspire publish
+
+            docker compose up -d --remove-orphans

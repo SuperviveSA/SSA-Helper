@@ -7,13 +7,13 @@ using MatchType = Shared.Data.Entities.Supervive.MatchType;
 
 namespace Shared.Services {
 	public static class SuperviveDataAdapter {
-		public static Player PlayerMatchDataToPlayerDb(PrivateMatchData data) => new Player {
+		public static Player PlayerMatchDataToPlayerDb(PrivateMatchData data) => new() {
 			PlayerId        = data.PlayerId,
 			PlayerIdEncoded = data.PlayerIdEncoded,
 			Platform        = data.Platform.Code
 		};
 
-		public static Match MatchDataToDb(PrivateMatchData data, PublicMatchData[] extraData) => new Match {
+		public static Match MatchDataToDb(PrivateMatchData data, PublicMatchData[] extraData) => new() {
 			MatchId      = data.MatchId,
 			Platform     = data.Platform.Code,
 			WinnerTeam   = extraData.FirstOrDefault(p => p.Placement == 1)?.TeamId,

@@ -370,3 +370,6 @@ FodyWeavers.xsd
 
 # Docker compose file
 docker-compose.yaml
+
+# Host data
+/Host/data
