@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: testing
     steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
     - name: Create .env
       run:
         touch ./Tests/.env && echo '${{ secrets.ENV_VARIABLES }}' > ./Tests/.env
