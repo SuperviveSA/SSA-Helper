@@ -27,7 +27,6 @@ jobs:
         run: dotnet format style --verify-no-changes --exclude */Migrations/* --severity info
 
   build:
-    needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
