@@ -1,34 +1,68 @@
 name: Run all tests
 
 on:
-  push:
-    branches: [ "*" ]
-    
-  pull_request:
-    branches: [ "*" ]
-    
+  push:        { branches: [ '**' ] }
+  pull_request: { branches: [ '**' ] }
+
+x-common-steps: &common
+  - uses: actions/checkout@v4
+
+  - name: Create .env from encrypted secret
+    run: |
+      printf '%s' "${{ secrets.ENV_VARIABLES }}" > .env
+
+  - uses: actions/setup-dotnet@v4
+    with:
+      dotnet-version: 9.0.x
+
+  - uses: actions/cache@v4
+    with:
+      path: ~/.nuget/packages
+      key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
-    environment: testing
     steps:
-    - name: Checkout source
-      uses: actions/checkout@v4
+    - <<: *common
 
-    - name: Create .env
-      run:
-        touch .env && echo '${{ secrets.ENV_VARIABLES }}' > .env
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.x
-
-    - name: Restore dependencies
+    - name: Restore
       run: dotnet restore
 
-    - name: Build
-      run: dotnet build --no-restore
+    - name: Lint (.editorconfig compliance)
+      run: dotnet format --verify-no-changes --severity info
+
+  build:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+    - <<: *common
+
+    - name: Restore
+      run: dotnet restore
+
+    - name: Build (Release)
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Publish build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-output
+        path: |
+          **/bin/Release
+          !**/*.pdb
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - <<: *common
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-output
+        path: .
 
     - name: Run tests
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --configuration Release --no-build --verbosity normal
