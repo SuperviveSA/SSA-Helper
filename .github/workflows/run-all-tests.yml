@@ -48,7 +48,7 @@ jobs:
       - name: Build (Release)
         run: dotnet build --configuration Release --no-restore
 
-      - name: Upload build artefacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-output
