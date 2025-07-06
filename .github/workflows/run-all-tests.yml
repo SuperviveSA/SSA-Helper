@@ -73,4 +73,4 @@ jobs:
           path: .
 
       - name: Run tests
-        run: dotnet test --configuration Release --no-build --no-restore --verbosity normal
+        run: dotnet test Tests/bin/Release/net9.0/Tests.dll --configuration Release --no-build --no-restore --verbosity normal
