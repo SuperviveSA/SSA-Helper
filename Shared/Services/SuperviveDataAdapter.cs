@@ -68,6 +68,7 @@ namespace Shared.Services {
 			EffectiveDamageTaken     = data.Stats.EffectiveDamageTaken     ?? 0,
 			HeroDamageTaken          = data.Stats.HeroDamageTaken          ?? 0,
 			HeroEffectiveDamageTaken = data.Stats.HeroEffectiveDamageTaken ?? 0,
+			ShieldMitigatedDamage    = data.Stats.ShieldMitigatedDamage    ?? 0
 		};
 
 		public static MatchType GetMatchType(PrivateMatchData privateData, PublicMatchData[] extraData) =>

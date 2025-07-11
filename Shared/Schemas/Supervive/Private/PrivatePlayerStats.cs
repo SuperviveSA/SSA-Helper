@@ -80,6 +80,9 @@ namespace Shared.Schemas.Supervive.Private {
 		
 		[JsonPropertyName("HeroEffectiveDamageTaken")]
 		public double? HeroEffectiveDamageTaken { get; init; }
+		
+		[JsonPropertyName("ShieldMitigatedDamage")]
+		public double? ShieldMitigatedDamage { get; init; }
 
 		#endregion
 	}
