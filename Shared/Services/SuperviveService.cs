@@ -103,12 +103,23 @@ namespace Shared.Services {
 		}
 
 		public async Task<PublicMatchData[]> GetMatch(string platform, string matchId) {
+			string             key    = $"match:{platform}:{matchId}";
+			PublicMatchData[]? cached = JsonSerializer.Deserialize<PublicMatchData[]>(await cache.GetStringAsync(key) ?? "null");
+
+			if (cached is not null) return cached;
+
 			HttpResponseMessage res = await client.GetAsync($"api/matches/{platform}-{matchId}");
 
 			res.EnsureSuccessStatusCode();
 
-			return await res.Content.ReadFromJsonAsync<PublicMatchData[]>()
+			PublicMatchData[] data = await res.Content.ReadFromJsonAsync<PublicMatchData[]>()
 				?? throw new NullReferenceException("data is null");
+
+			await cache.SetStringAsync(key, JsonSerializer.Serialize(data), new DistributedCacheEntryOptions {
+				AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(7)
+			});
+
+			return data;
 		}
 
 		public async Task<DataResponse<PrivateMatchData>> GetPlayerMatches(string platform, string playerId, int page = 1) {
