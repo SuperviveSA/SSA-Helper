@@ -14,7 +14,6 @@ namespace Discord.Commands {
 		public async Task RunAsync(
 			[SlashCommandParameter(AutocompleteProviderType = typeof(PlayerIdAutocompleteProvider))]
 			string playerId) {
-
 			await this.RespondAsync(InteractionCallback.Message(new InteractionMessageProperties {
 				Embeds = [await sync.GetUpdatedSyncEmbed([playerId])],
 				Components = [
@@ -27,8 +26,9 @@ namespace Discord.Commands {
 			int count = await dataIntegration.SyncPlayerMatches(playerId.Split('-')[0], playerId.Split('-')[1]);
 
 			await this.ModifyResponseAsync(m => {
-				m.Content = null;
-				m.Embeds  = [Embeds.SuccessEmbed.WithDescription($"Synced user {playerId} successfully with {count} new matches")];
+				m.Content    = null;
+				m.Embeds     = [Embeds.SuccessEmbed.WithDescription($"Synced user {playerId} successfully with {count} new matches")];
+				m.Components = [];
 			});
 		}
 	}
