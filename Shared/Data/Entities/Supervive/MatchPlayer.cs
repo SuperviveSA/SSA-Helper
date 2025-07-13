@@ -54,15 +54,19 @@ namespace Shared.Data.Entities.Supervive {
 
 		#region Gameplay Stats
 		
+		[Column("healing_given")]
 		[JsonPropertyName("healing_given")]
 		public double HealingGiven { get; set; }
 		
+		[Column("healing_given_self")]
 		[JsonPropertyName("healing_given_self")]
 		public double HealingGivenSelf { get; set; }
 		
+		[Column("hero_effective_damage_done")]
 		[JsonPropertyName("hero_effective_damage_done")]
 		public double HeroEffectiveDamageDone { get; set; }
 		
+		[Column("hero_effective_damage_taken")]
 		[JsonPropertyName("hero_effective_damage_taken")]
 		public double HeroEffectiveDamageTaken { get; set; }
 		
