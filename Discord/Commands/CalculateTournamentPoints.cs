@@ -26,7 +26,7 @@ namespace Discord.Commands {
 			await this.RespondAsync(InteractionCallback.DeferredMessage());
 
 			PublicMatchData[][] matches;
-			if (matchIds == "") {
+			if (matchIds is null) {
 				if (playerId is null) {
 					await this.ModifyResponseAsync(m => {
 						m.Embeds = [Embeds.ErrorEmbed.WithDescription("PlayerId cannot be null when not passing matchIds")];
@@ -43,21 +43,12 @@ namespace Discord.Commands {
 											.Select(async m =>
 														await supervive.GetMatch(m.Platform.Code, m.MatchId))
 											.ToArray());
-			} else {
-				if (matchIds is null) {
-					await this.ModifyResponseAsync(m => {
-						m.Embeds = [Embeds.ErrorEmbed.WithDescription("MatchIds cannot be null when not passing playerId")];
-					});
-
-					return;
-				}
-
+			} else
 				matches = await Task.WhenAll(matchIds
 											.Split(',')
 											.Select(async m =>
 														await supervive.GetMatch(m.Split('-')[0], string.Join('-', m.Split('-').TakeLast(5))))
 											.ToArray());
-			}
 
 			Dictionary<int, int> placement         = tournament.CalculateTeamPoints(matches);
 			PublicMatchData[]    summedPlayerStats = tournament.SumPlayerStats(matches);
