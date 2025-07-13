@@ -10,12 +10,12 @@ namespace Shared.Services {
 		public static Player PlayerMatchDataToPlayerDb(PrivateMatchData data) => new() {
 			PlayerId        = data.PlayerId,
 			PlayerIdEncoded = data.PlayerIdEncoded,
-			Platform        = data.Platform.Code
+			Platform        = data.Platform?.Code ?? GetPlatform(data.PlatformId)
 		};
 
 		public static Match MatchDataToDb(PrivateMatchData data, PublicMatchData[] extraData) => new() {
 			MatchId      = data.MatchId,
-			Platform     = data.Platform.Code,
+			Platform     = data.Platform?.Code ?? GetPlatform(data.PlatformId),
 			WinnerTeam   = extraData.FirstOrDefault(p => p.Placement == 1)?.TeamId,
 			Type         = GetMatchType(data, extraData),
 			IsRanked     = false,
@@ -77,5 +77,10 @@ namespace Shared.Services {
 				"default"    => MatchType.Trios,
 				_            => extraData.Length <= 9 ? MatchType.Arena : MatchType.Trios
 			};
+
+		public static string GetPlatform(int platformCode) => platformCode switch {
+			1 => "steam",
+			_ => throw new Exception("Unknown platform id")
+		};
 	}
 }

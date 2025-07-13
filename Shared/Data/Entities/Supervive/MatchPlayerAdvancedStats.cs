@@ -84,41 +84,53 @@ namespace Shared.Data.Entities.Supervive {
 		public int GoldFromMonsters { get; set; }
 
 		// Healing
+		[Column("healing_given")]
 		[JsonPropertyName("healing_given")]
 		public double HealingGiven { get; set; }
 
+		[Column("healing_given_self")]
 		[JsonPropertyName("healing_given_self")]
 		public double HealingGivenSelf { get; set; }
 
+		[Column("healing_received")]
 		[JsonPropertyName("healing_received")]
 		public double HealingReceived { get; set; }
 
 		// Damage dealt
+		[Column("damage_done")]
 		[JsonPropertyName("damage_done")]
 		public double DamageDone { get; set; }
 
+		[Column("effective_damage_done")]
 		[JsonPropertyName("effective_damage_done")]
 		public double EffectiveDamageDone { get; set; }
 
+		[Column("hero_damage_done")]
 		[JsonPropertyName("hero_damage_done")]
 		public double HeroDamageDone { get; set; }
 
+		[Column("hero_effective_damage_done")]
 		[JsonPropertyName("hero_effective_damage_done")]
 		public double HeroEffectiveDamageDone { get; set; }
 
 		// Damage taken
+		[Column("damage_taken")]
 		[JsonPropertyName("damage_taken")]
 		public double DamageTaken { get; set; }
 
+		[Column("effective_damage_taken")]
 		[JsonPropertyName("effective_damage_taken")]
 		public double EffectiveDamageTaken { get; set; }
 
+		[Column("hero_damage_taken")]
 		[JsonPropertyName("hero_damage_taken")]
 		public double HeroDamageTaken { get; set; }
 
+		[Column("hero_effective_damage_taken")]
 		[JsonPropertyName("hero_effective_damage_taken")]
 		public double HeroEffectiveDamageTaken { get; set; }
 
+		[Column("shield_mitigated_damage")]
 		[JsonPropertyName("shield_mitigated_damage")]
 		public double ShieldMitigatedDamage { get; set; }
 

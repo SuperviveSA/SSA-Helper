@@ -1,14 +1,10 @@
-﻿using System.Net;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Http.Resilience;
-
-using Polly;
 
 using Shared.Schemas.Supervive;
 using Shared.Schemas.Supervive.Private;
@@ -30,22 +26,18 @@ namespace Shared.Services {
 
 		public static void ConfigureService(IServiceCollection services) {
 			services.AddHttpClient<ISuperviveService, SuperviveService>(client => {
-				client.Timeout     = TimeSpan.FromSeconds(150);
-				client.BaseAddress = Url;
-			}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler {
-				AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli
-			}).AddResilienceHandler("Default-Supervive", static builder => {
-				builder.AddRetry(new HttpRetryStrategyOptions {
-					BackoffType      = DelayBackoffType.Exponential,
-					MaxRetryAttempts = 15,
-				});
-			});
+						 client.BaseAddress = Url;
+					 })
+					.AddStandardResilienceHandler(options => {
+						 options.Retry.MaxRetryAttempts       = 15;
+						 options.Retry.ShouldRetryAfterHeader = true;
+						 options.AttemptTimeout.Timeout       = TimeSpan.FromSeconds(15);
+						 options.TotalRequestTimeout.Timeout  = TimeSpan.FromSeconds(150);
+					 });
 
 			services.AddHttpClient("Supervive‐NoRetry", client => {
-				client.Timeout     = TimeSpan.FromSeconds(150);
+				client.Timeout     = TimeSpan.FromSeconds(15);
 				client.BaseAddress = Url;
-			}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler {
-				AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli
 			});
 		}
 
@@ -70,7 +62,7 @@ namespace Shared.Services {
 			if (cached is not null) return cached;
 
 			HttpResponseMessage res = await client.GetAsync(QueryHelpers.AddQueryString("api/players/search", new Dictionary<string, string?> {
-				{ "query", query },
+				{ "query", query }
 			}));
 
 			res.EnsureSuccessStatusCode();
@@ -78,8 +70,8 @@ namespace Shared.Services {
 			PrivatePlayerData[] data = await res.Content.ReadFromJsonAsync<PrivatePlayerData[]>()
 									?? throw new NullReferenceException("data is null");
 
-			await cache.SetStringAsync(query, JsonSerializer.Serialize(data), new DistributedCacheEntryOptions {
-				AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+			await cache.SetStringAsync(key, JsonSerializer.Serialize(data), new DistributedCacheEntryOptions {
+				AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2)
 			});
 
 			return data;
@@ -103,12 +95,23 @@ namespace Shared.Services {
 		}
 
 		public async Task<PublicMatchData[]> GetMatch(string platform, string matchId) {
+			string             key    = $"match:{platform}:{matchId}";
+			PublicMatchData[]? cached = JsonSerializer.Deserialize<PublicMatchData[]>(await cache.GetStringAsync(key) ?? "null");
+
+			if (cached is not null) return cached;
+
 			HttpResponseMessage res = await client.GetAsync($"api/matches/{platform}-{matchId}");
 
 			res.EnsureSuccessStatusCode();
 
-			return await res.Content.ReadFromJsonAsync<PublicMatchData[]>()
-				?? throw new NullReferenceException("data is null");
+			PublicMatchData[] data = await res.Content.ReadFromJsonAsync<PublicMatchData[]>()
+								  ?? throw new NullReferenceException("data is null");
+
+			await cache.SetStringAsync(key, JsonSerializer.Serialize(data), new DistributedCacheEntryOptions {
+				AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(7)
+			});
+
+			return data;
 		}
 
 		public async Task<DataResponse<PrivateMatchData>> GetPlayerMatches(string platform, string playerId, int page = 1) {

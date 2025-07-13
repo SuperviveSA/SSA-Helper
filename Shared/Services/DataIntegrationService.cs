@@ -50,6 +50,7 @@ namespace Shared.Services {
 					await this.UpsertMatchPlayer(SuperviveDataAdapter.IndividualMatchDataToDb(privateData.MatchId, individualPublicData));
 				}
 
+				player.LastSyncedMatch = privateData.MatchId;
 				await ctx.SaveChangesAsync();
 			}
 
@@ -64,7 +65,7 @@ namespace Shared.Services {
 			int                            currentPage = current.Meta.CurrentPage;
 
 			// While no current page does not contain last synced && there are pages left
-			while (current.Data.All(m => m.MatchId != lastSyncedMatch) && currentPage < current.Meta.LastPage) {
+			while (current.Data.All(m => m.MatchId != lastSyncedMatch) && currentPage <= current.Meta.LastPage) {
 				matches.AddRange(current.Data.TakeWhile(m => m.MatchId != lastSyncedMatch));
 
 				current = await supervive.GetPlayerMatches(player.Platform, player.PlayerId, ++currentPage);
