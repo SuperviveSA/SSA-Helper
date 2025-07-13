@@ -78,8 +78,8 @@ namespace Shared.Services {
 			PrivatePlayerData[] data = await res.Content.ReadFromJsonAsync<PrivatePlayerData[]>()
 									?? throw new NullReferenceException("data is null");
 
-			await cache.SetStringAsync(query, JsonSerializer.Serialize(data), new DistributedCacheEntryOptions {
-				AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+			await cache.SetStringAsync(key, JsonSerializer.Serialize(data), new DistributedCacheEntryOptions {
+				AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2)
 			});
 
 			return data;
