@@ -9,7 +9,7 @@ namespace Shared.Services {
 		public int                  CalculateSinglePlayerPoints(PublicMatchData playerMatchData);
 	}
 
-	public class TournamentService(ISuperviveService supervive) :ITournamentService {
+	public class TournamentService :ITournamentService {
 		private readonly Dictionary<int, int> positionPoints = new() {
 			{ 1, 20 },
 			{ 2, 15 },
