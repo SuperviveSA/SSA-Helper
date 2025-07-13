@@ -41,7 +41,7 @@ namespace Discord.Commands {
 											.Data
 											.Take(matchCount)
 											.Select(async m =>
-														await supervive.GetMatch(m.Platform.Code, m.MatchId))
+														await supervive.GetMatch(playerId.Split('-')[0], m.MatchId))
 											.ToArray());
 			} else
 				matches = await Task.WhenAll(matchIds

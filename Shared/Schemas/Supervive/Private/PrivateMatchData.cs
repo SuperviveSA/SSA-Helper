@@ -2,6 +2,9 @@
 
 namespace Shared.Schemas.Supervive.Private {
 	public record PrivateMatchData : SuperviveEntity{
+		[JsonPropertyName("platform_id")]
+		public int PlatformId { get; init; }
+		
 		[JsonPropertyName("character_level")]
 		public int CharacterLevel { get; init; }
 		
@@ -21,7 +24,7 @@ namespace Shared.Schemas.Supervive.Private {
 		public int Placement { get; init; }
 		
 		[JsonPropertyName("platform")]
-		public required MatchPlatform Platform { get; init; }
+		public MatchPlatform? Platform { get; init; }
 		
 		[JsonPropertyName("player_id_encoded")]
 		public required string PlayerIdEncoded { get; init; }
