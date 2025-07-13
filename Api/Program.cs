@@ -59,6 +59,7 @@ builder.AddRedisDistributedCache("cache");
 DiscordExtensions.ConfigureService(builder);
 SuperviveService.ConfigureService(builder.Services);
 DataIntegrationService.ConfigureService(builder.Services);
+TournamentService.ConfigureService(builder.Services);
 
 WebApplication app = builder.Build();
 

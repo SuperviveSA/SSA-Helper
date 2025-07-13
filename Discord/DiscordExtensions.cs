@@ -21,8 +21,6 @@ namespace Discord {
 				options.Token   = builder.Configuration.GetValue<string>("discord-token");
 			});
 
-			//services.AddGatewayHandler<MessageCreateHandler>();
-
 			builder.Services.AddApplicationCommands(options => {
 				options.ResultHandler = new DefaultResultHandler();
 			});
@@ -31,6 +29,7 @@ namespace Discord {
 			builder.Services.AddSingleton<PingCommand>();
 
 			MatchSyncService.ConfigureService(builder.Services);
+			TournamentHelperService.ConfigureService(builder.Services);
 		}
 
 		public static void ConfigureHost(WebApplication host) {
@@ -44,6 +43,8 @@ namespace Discord {
 			host.AddComponentInteractionModule<SyncMatchesCommandInteractions>();
 
 			host.AddApplicationCommandModule<RunMigrations>();
+			
+			host.AddApplicationCommandModule<CalculateTournamentPoints>();
 		}
 	}
 }
