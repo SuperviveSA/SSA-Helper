@@ -50,6 +50,7 @@ namespace Shared.Services {
 					await this.UpsertMatchPlayer(SuperviveDataAdapter.IndividualMatchDataToDb(privateData.MatchId, individualPublicData));
 				}
 
+				player.LastSyncedMatch = privateData.MatchId;
 				await ctx.SaveChangesAsync();
 			}
 
