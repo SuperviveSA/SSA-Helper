@@ -1,5 +1,6 @@
 ﻿using Shared.Data.Entities;
 using Shared.Data.Entities.Supervive;
+using Shared.Schemas.Supervive;
 using Shared.Schemas.Supervive.Private;
 using Shared.Schemas.Supervive.Public;
 
@@ -82,6 +83,31 @@ namespace Shared.Services {
 		public static string GetPlatform(int platformCode) => platformCode switch {
 			1 => "steam",
 			_ => throw new Exception("Unknown platform id")
+		};
+
+		public static string GetInternalHeroName(SuperviveHero hero) => hero switch {
+			SuperviveHero.Brall   => "hero:ronin",
+			SuperviveHero.Carbine => "hero:bountyhunter",
+			SuperviveHero.Crysta  => "hero:burstcaster",
+			SuperviveHero.Ghost   => "hero:assault",
+			SuperviveHero.Jin     => "hero:stalker",
+			SuperviveHero.Joule   => "hero:storm",
+			SuperviveHero.Myth    => "hero:huntress",
+			SuperviveHero.Saros   => "hero:farshot",
+			SuperviveHero.Shiv    => "hero:flex",
+			SuperviveHero.Shrike  => "hero:sniper",
+			SuperviveHero.Bishop  => "hero:rocketjumper",
+			SuperviveHero.Kingpin => "hero:hookguy",
+			SuperviveHero.Felix   => "hero:firefox",
+			SuperviveHero.Oath    => "hero:shieldbot",
+			SuperviveHero.Elluna  => "hero:reshealer",
+			SuperviveHero.Eva     => "hero:succubus",
+			SuperviveHero.Zeph    => "hero:backlinehealer",
+			SuperviveHero.Beebo   => "hero:beebo",
+			SuperviveHero.Celeste => "hero:freeze",
+			SuperviveHero.Hudson  => "hero:gunner",
+			SuperviveHero.Void    => "hero:void",
+			_                     => throw new ArgumentOutOfRangeException(nameof(hero), hero, "Unknown hero")
 		};
 	}
 }
