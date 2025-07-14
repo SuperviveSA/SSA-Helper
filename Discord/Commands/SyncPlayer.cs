@@ -12,7 +12,7 @@ namespace Discord.Commands {
 	public class SyncPlayer(IDataIntegrationService dataIntegration, ISuperviveService supervive) :ApplicationCommandModule<ApplicationCommandContext> {
 		[SlashCommand("sync_player", "Sincroniza os dados de um único usuário (player_id e player_id_encoded)")]
 		public async Task RunAsync(
-			[SlashCommandParameter(AutocompleteProviderType = typeof(PlayerUniqueDisplayNameAutocompleteProvider))]
+			[SlashCommandParameter(AutocompleteProviderType = typeof(PlayerNameProvider))]
 			string uniqueDisplayName) {
 			await this.RespondAsync(InteractionCallback.DeferredMessage());
 

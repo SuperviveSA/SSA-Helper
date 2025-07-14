@@ -12,7 +12,7 @@ using Shared.Services;
 
 namespace Discord.Services {
 	public interface IMatchSyncService {
-		Task<EmbedProperties> GetUpdatedSyncEmbed(string[] playerIds);
+		Task<EmbedProperties> GetUpdatedSyncEmbed(string[] playerNames, string platform = "steam");
 	}
 
 	public class MatchSyncService(ISuperviveService supervive, AppDbContext ctx) :IMatchSyncService {
@@ -20,17 +20,17 @@ namespace Discord.Services {
 			services.AddScoped<IMatchSyncService, MatchSyncService>();
 		}
 
-		public async Task<EmbedProperties> GetUpdatedSyncEmbed(string[] playerIds) {
+		public async Task<EmbedProperties> GetUpdatedSyncEmbed(string[] playerNames, string platform = "steam") {
 			List<EmbedFieldProperties> fields = [];
-			foreach (string fullPlayerId in playerIds) {
-				string platform = fullPlayerId.Split('-')[0];
-				string playerId = fullPlayerId.Split('-')[1];
+			foreach (string playerName in playerNames) {
+				PrivatePlayerData playerData = (await supervive.SearchPlayers(playerName))
+				   .First(p => p.Platform == platform);
 
-				Task<int> totalMatches = ctx.Matches
-											.Where(m => m.Players.Any(mp => mp.Player!.PlayerId == playerId))
+				Task<int> totalMatches = ctx.MatchPlayersAdvancedStats
+											.Where(m => m.PlayerId == playerData.UserId)
 											.CountAsync();
 
-				Task<DataResponse<PrivateMatchData>> data = supervive.GetPlayerMatches(platform, playerId);
+				Task<DataResponse<PrivateMatchData>> data = supervive.GetPlayerMatches(platform, playerData.UserId);
 
 				await Task.WhenAll(totalMatches, data);
 				int   total   = data.Result.Meta.Total;
@@ -38,8 +38,8 @@ namespace Discord.Services {
 				float percent = (float)done / total * 100;
 
 				fields.Add(new EmbedFieldProperties {
-					Name   = $"Progresso: *{done}/{total}* {percent:f2}%",
-					Value  = fullPlayerId,
+					Name   = playerData.UniqueDisplayName,
+					Value  = $"Progresso: **{done}/{total}** ({percent:f2})%\n{platform}-{playerData.UserId}",
 					Inline = false
 				});
 			}

@@ -6,7 +6,7 @@ using Shared.Schemas.Supervive.Private;
 using Shared.Services;
 
 namespace Discord.Providers {
-	public class PlayerUniqueDisplayNameAutocompleteProvider(ISuperviveService supervive) :IAutocompleteProvider<AutocompleteInteractionContext> {
+	public class PlayerNameProvider(ISuperviveService supervive) :IAutocompleteProvider<AutocompleteInteractionContext> {
 		public async ValueTask<IEnumerable<ApplicationCommandOptionChoiceProperties>?> GetChoicesAsync(ApplicationCommandInteractionDataOption option, AutocompleteInteractionContext context) {
 			if (option.Value is null) return null;
 
