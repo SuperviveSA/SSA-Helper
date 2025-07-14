@@ -45,6 +45,7 @@ namespace Discord {
 			host.AddApplicationCommandModule<RunMigrations>();
 			
 			host.AddApplicationCommandModule<CalculateTournamentPoints>();
+			host.AddApplicationCommandModule<Compare>();
 		}
 	}
 }
