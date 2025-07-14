@@ -31,6 +31,7 @@ namespace Shared.Services {
 			TeamId                   = data.TeamId,
 			Hero                     = data.HeroAssetId,
 			SurvivalDuration         = data.SurvivalDuration,
+			Placement                = data.Placement,
 			Kills                    = data.Stats.Kills,
 			Deaths                   = data.Stats.Deaths,
 			Assists                  = data.Stats.Assists,
