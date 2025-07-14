@@ -106,7 +106,20 @@ namespace Discord.Commands {
 					  P1WinsArena = g.Count(x => x.WinnerTeam  == x.P1Team     && x.Type == MatchType.Arena),
 					  P2WinsTrios = g.Count(x => x.P2Placement < x.P1Placement && x.Type == MatchType.Trios),
 					  P2WinsArena = g.Count(x => x.WinnerTeam  == x.P2Team     && x.Type == MatchType.Arena)
-				  }).SingleAsync();
+				  }).SingleOrDefaultAsync();
+
+			if (stats is null) {
+				string extraMessage = $" jogando de **{hero1.ToString() ?? "qualquer"}** e **{hero2.ToString() ?? "qualquer"}** respectivamente";
+				await this.ModifyResponseAsync(m => {
+					m.Embeds = [
+						Embeds.ErrorEmbed.WithDescription(
+							$"Nenhuma partida encontrada onde os players: **{player1}** e **{player2}** estavam em times inimigos" +
+							(hero1 is null && hero2 is null ? "" : extraMessage))
+					];
+					m.Components = [];
+				});
+				return;
+			}
 
 			EmbedProperties embed = new() {
 				Title       = $"{player1} vs {player2}",
