@@ -30,14 +30,14 @@ namespace Discord {
 					m.Content    = null;
 					m.Embeds     = [Embeds.CodeError(exceptionResult.Exception)];
 					m.Flags      = messageFlags;
-					m.Components = null;
+					m.Components = [];
 				});
 			} catch (Exception) {
 				await interaction.SendResponseAsync(InteractionCallback.Message(new InteractionMessageProperties {
 					Content    = null,
 					Embeds = [Embeds.CodeError(exceptionResult.Exception)],
 					Flags      = messageFlags,
-					Components = null
+					Components = []
 				}));
 			}
 		}
