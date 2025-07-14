@@ -29,10 +29,20 @@ namespace Shared.Services {
 						 client.BaseAddress = Url;
 					 })
 					.AddStandardResilienceHandler(options => {
+						 options.Retry.Name                   = "Supervive-Retry";
 						 options.Retry.MaxRetryAttempts       = 15;
 						 options.Retry.ShouldRetryAfterHeader = true;
-						 options.AttemptTimeout.Timeout       = TimeSpan.FromSeconds(15);
-						 options.TotalRequestTimeout.Timeout  = TimeSpan.FromSeconds(150);
+
+						 // Disable circuit breaker
+						 options.CircuitBreaker.ShouldHandle     = _ => ValueTask.FromResult(false);
+						 options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(240);
+						 options.CircuitBreaker.FailureRatio     = 1;
+
+						 options.AttemptTimeout.Name    = "Supervive-AttemptTimeout";
+						 options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(60);
+
+						 options.TotalRequestTimeout.Name    = "Supervive-TotalRequestTimeout";
+						 options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(180);
 					 });
 
 			services.AddHttpClient("Supervive‐NoRetry", client => {
