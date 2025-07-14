@@ -102,9 +102,9 @@ namespace Discord.Commands {
 				 .Select(g => new {
 					  TotalTrios  = g.Count(x => x.Type == MatchType.Trios),
 					  TotalArena  = g.Count(x => x.Type == MatchType.Arena),
-					  P1WinsTrios = g.Count(x => x.P1Placement > x.P2Placement && x.Type == MatchType.Trios),
+					  P1WinsTrios = g.Count(x => x.P1Placement < x.P2Placement && x.Type == MatchType.Trios),
 					  P1WinsArena = g.Count(x => x.WinnerTeam  == x.P1Team     && x.Type == MatchType.Arena),
-					  P2WinsTrios = g.Count(x => x.P2Placement > x.P1Placement && x.Type == MatchType.Trios),
+					  P2WinsTrios = g.Count(x => x.P2Placement < x.P1Placement && x.Type == MatchType.Trios),
 					  P2WinsArena = g.Count(x => x.WinnerTeam  == x.P2Team     && x.Type == MatchType.Arena)
 				  }).SingleAsync();
 
