@@ -81,7 +81,7 @@ namespace Shared.Services {
 									?? throw new NullReferenceException("data is null");
 
 			await cache.SetStringAsync(key, JsonSerializer.Serialize(data), new DistributedCacheEntryOptions {
-				AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2)
+				AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(7)
 			});
 
 			return data;
@@ -118,7 +118,7 @@ namespace Shared.Services {
 								  ?? throw new NullReferenceException("data is null");
 
 			await cache.SetStringAsync(key, JsonSerializer.Serialize(data), new DistributedCacheEntryOptions {
-				AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(7)
+				SlidingExpiration = TimeSpan.FromDays(15)
 			});
 
 			return data;
