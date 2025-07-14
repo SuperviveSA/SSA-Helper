@@ -36,17 +36,17 @@ namespace Shared.Services {
 			// Sync in reverse to be able to gracefully retry in case of error
 			pendingMatches = pendingMatches.Reverse().ToArray();
 			foreach (PrivateMatchData privateData in pendingMatches) {
+				await this.UpsertMatchPlayerAdvancedStats(SuperviveDataAdapter.PrivateMatchDataAdvancedStatsToDb(privateData.MatchId, privateData));
+
 				if (await ctx.Matches.AnyAsync(m => m.MatchId == privateData.MatchId)) continue;
 
 				PublicMatchData[] publicData = await supervive.GetMatch(platform, privateData.MatchId);
-
 				ctx.Matches.Add(SuperviveDataAdapter.MatchDataToDb(privateData, publicData));
-				ctx.MatchPlayersAdvancedStats.Add(SuperviveDataAdapter.PrivateMatchDataAdvancedStatsToDb(privateData.MatchId, privateData));
-
+				
 				foreach (PublicMatchData individualPublicData in publicData) {
 					if (individualPublicData.Player.UniqueDisplayName is null) continue;
-					await this.SyncPlayer(individualPublicData.Player.UniqueDisplayName, false);
 
+					await this.SyncPlayer(individualPublicData.Player.UniqueDisplayName, false);
 					await this.UpsertMatchPlayer(SuperviveDataAdapter.IndividualMatchDataToDb(privateData.MatchId, individualPublicData));
 				}
 
@@ -93,26 +93,22 @@ namespace Shared.Services {
 			return syncedPlayers.ToArray();
 		}
 
+		private async Task UpsertMatchPlayerAdvancedStats(MatchPlayerAdvancedStats data) {
+			MatchPlayerAdvancedStats? existingData = await ctx.MatchPlayersAdvancedStats.FindAsync(data.MatchId, data.PlayerId);
+
+			if (existingData is null) ctx.MatchPlayersAdvancedStats.Add(data);
+		}
+
 		private async Task UpsertMatchPlayer(MatchPlayer matchPlayerData) {
 			MatchPlayer? existingMatchPlayer = await ctx.MatchPlayers.FindAsync(matchPlayerData.MatchId, matchPlayerData.PlayerIdEncoded);
 
 			if (existingMatchPlayer is null) ctx.MatchPlayers.Add(matchPlayerData);
-			else {
-				ctx.Entry(existingMatchPlayer).CurrentValues.SetValues(matchPlayerData);
-				ctx.Entry(existingMatchPlayer).Property(p => p.CreatedAt).IsModified = false;
-			}
 		}
 
 		private async Task<Player> UpsertPlayer(Player playerData) {
 			Player? existingPlayer = await ctx.Players.FindAsync(playerData.PlayerId);
 
-			if (existingPlayer is null) ctx.Players.Add(playerData);
-			else {
-				ctx.Entry(existingPlayer).CurrentValues.SetValues(playerData);
-				ctx.Entry(existingPlayer).Property(p => p.CreatedAt).IsModified = false;
-			}
-
-			return existingPlayer ?? playerData;
+			return existingPlayer ?? ctx.Players.Add(playerData).Entity;
 		}
 
 		private static string EncodePlayerId(string playerId) {
