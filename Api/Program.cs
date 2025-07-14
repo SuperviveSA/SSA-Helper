@@ -37,8 +37,6 @@ if (useOtlpExporter) builder.Services.AddOpenTelemetry().UseOtlpExporter();
 builder.Services.AddServiceDiscovery();
 
 builder.Services.ConfigureHttpClientDefaults(http => {
-	http.AddStandardResilienceHandler();
-
 	http.AddServiceDiscovery();
 });
 

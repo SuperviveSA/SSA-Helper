@@ -39,6 +39,10 @@ namespace Shared.Data.Entities.Supervive {
 		[JsonPropertyName("survival_duration")]
 		public double SurvivalDuration { get; set; }
 		
+		[Column("placement")]
+		[JsonPropertyName("placement")]
+		public int Placement { get; set; }
+		
 		[Column("kills")]
 		[JsonPropertyName("kills")]
 		public int Kills { get; set; }
