@@ -22,7 +22,6 @@ IResourceBuilder<ProjectResource> api = builder.AddProject<Projects.Api>("backen
 cache.WithImage("library/redis", "8-alpine");
 cache.WithLifetime(ContainerLifetime.Persistent);
 cache.WithDataBindMount(source: "./data/cache");
-
 cache.WithHostPort(6379);
 
 pg.WithImage("library/postgres", "17-alpine");
