@@ -22,11 +22,12 @@ namespace Shared.Services {
 	public partial class SuperviveService(IDistributedCache cache, HttpClient client, IHttpClientFactory httpFactory) :ISuperviveService {
 		#region ConfigureService
 
-		private static readonly Uri Url = new("https://supervive.op.gg/");
+		private static readonly Uri Url = new("https://op.gg/supervive/");
 
 		public static void ConfigureService(IServiceCollection services) {
 			services.AddHttpClient<ISuperviveService, SuperviveService>(client => {
 						 client.BaseAddress = Url;
+						 client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36");
 					 })
 					.AddStandardResilienceHandler(options => {
 						 options.Retry.Name                   = "Supervive-Retry";
