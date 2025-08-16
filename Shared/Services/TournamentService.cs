@@ -4,8 +4,8 @@ using Shared.Schemas.Supervive.Public;
 
 namespace Shared.Services {
 	public interface ITournamentService {
-		public PublicMatchData[]    SumPlayerStats(PublicMatchData[][]                    matchesData);
-		public Dictionary<int, int> CalculateTeamPoints(PublicMatchData[][]       matchesData);
+		public PublicMatchData[]    SumPlayerStats(PublicMatchData[][]          matchesData);
+		public Dictionary<int, int> CalculateTeamPoints(PublicMatchData[][]     matchesData);
 		public int                  CalculateSinglePlayerPoints(PublicMatchData playerMatchData);
 	}
 
@@ -28,7 +28,7 @@ namespace Shared.Services {
 		public static void ConfigureService(IServiceCollection services) {
 			services.AddScoped<ITournamentService, TournamentService>();
 		}
-		
+
 		public PublicMatchData[] SumPlayerStats(PublicMatchData[][] matchesData) {
 			Dictionary<string, PublicMatchData> data = [];
 			foreach (PublicMatchData[] matchData in matchesData)
@@ -58,12 +58,19 @@ namespace Shared.Services {
 			Dictionary<int, int> teamPoints = [];
 
 			foreach (PublicMatchData[] match in matchesData) {
-				foreach (PublicMatchData playerMatchData in match.DistinctBy(m => m.TeamId)) {
-					teamPoints[playerMatchData.TeamId] = this.positionPoints[playerMatchData.Placement];
+				foreach (IGrouping<int, PublicMatchData> teamGroup in match.GroupBy(p => p.TeamId)) {
+					int teamId = teamGroup.Key;
+
+					// Placement is the same for every player of a team in a match
+					int placement    = teamGroup.First().Placement;
+					int placementPts = this.positionPoints.GetValueOrDefault(placement, 0);
+
+					// Ensure team exists, then accumulate placement + player points
+					teamPoints.TryAdd(teamId, 0);
+					teamPoints[teamId] += placementPts;
+
+					teamPoints[teamId] += teamGroup.Sum(this.CalculateSinglePlayerPoints);
 				}
-				
-				foreach (PublicMatchData playerMatchData in match)
-					teamPoints[playerMatchData.TeamId] += this.CalculateSinglePlayerPoints(playerMatchData);	
 			}
 
 			return teamPoints;
