@@ -49,6 +49,7 @@ namespace Shared.Services {
 			services.AddHttpClient("Supervive‐NoRetry", client => {
 				client.Timeout     = TimeSpan.FromSeconds(15);
 				client.BaseAddress = Url;
+				client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36");
 			});
 		}
 
