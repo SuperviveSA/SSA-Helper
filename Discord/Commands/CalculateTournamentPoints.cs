@@ -23,7 +23,9 @@ namespace Discord.Commands {
 			[SlashCommandParameter(Description = "Match id list sepparated by ,")]
 			string? matchIds = null,
 			[SlashCommandParameter]
-			string platform = "steam"
+			string platform = "steam",
+			[SlashCommandParameter(Description = "Number of teams to display in the result embed")]
+			int topTeams = 3
 		) {
 			await this.RespondAsync(InteractionCallback.DeferredMessage());
 
@@ -53,11 +55,11 @@ namespace Discord.Commands {
 														await supervive.GetMatch(m.Split('-')[0], string.Join('-', m.Split('-').TakeLast(5))))
 											.ToArray());
 
-			Dictionary<int, int> placement         = tournament.CalculateTeamPoints(matches);
-			PublicMatchData[]    summedPlayerStats = tournament.SumPlayerStats(matches);
+			Dictionary<string, int> placement         = tournament.CalculateTeamPoints(matches);
+			PublicMatchData[]       summedPlayerStats = tournament.SumPlayerStats(matches);
 
 			await this.ModifyResponseAsync(m => {
-				m.Embeds = [tournamentHelper.BuildTournamentResultEmbed(placement, summedPlayerStats)];
+				m.Embeds = [tournamentHelper.BuildTournamentResultEmbed(placement, summedPlayerStats, topTeams)];
 				if (attachData) m.Attachments = [tournamentHelper.BuildTournamentResultCsv(summedPlayerStats)];
 			});
 		}
