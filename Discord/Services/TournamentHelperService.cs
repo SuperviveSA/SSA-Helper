@@ -11,9 +11,9 @@ using Shared.Services;
 
 namespace Discord.Services {
 	public interface ITournamentHelperService {
-		public EmbedProperties      BuildTournamentResultEmbed(Dictionary<int, int>       placementData, PublicMatchData[] matchData, int topTeams = 3);
+		public EmbedProperties      BuildTournamentResultEmbed(Dictionary<string, int>    placementData, PublicMatchData[] matchData, int topTeams = 3);
 		public AttachmentProperties BuildTournamentResultCsv(IEnumerable<PublicMatchData> matchData);
-		public string               BuildPlayerStats(int                                  teamId, IEnumerable<PublicMatchData> players);
+		public string               BuildPlayerStats(string                               rosterId, IEnumerable<PublicMatchData> players);
 	}
 
 	public class TournamentHelperService(ITournamentService tournamentService) :ITournamentHelperService {
@@ -21,12 +21,12 @@ namespace Discord.Services {
 			services.AddScoped<ITournamentHelperService, TournamentHelperService>();
 		}
 
-		public EmbedProperties BuildTournamentResultEmbed(Dictionary<int, int> placementData, PublicMatchData[] matchData, int topTeams = 3) {
+		public EmbedProperties BuildTournamentResultEmbed(Dictionary<string, int> placementData, PublicMatchData[] matchData, int topTeams = 3) {
 			List<EmbedFieldProperties> fields = [];
 
-			foreach (KeyValuePair<int, int> kv in placementData.OrderByDescending(kv => kv.Value)) {
+			foreach (KeyValuePair<string, int> kv in placementData.OrderByDescending(kv => kv.Value)) {
 				fields.Add(new EmbedFieldProperties {
-					Name   = $"#{fields.Count + 1} - Time {kv.Key}: {kv.Value}pts",
+					Name   = $"#{fields.Count + 1}: {kv.Value}pts",
 					Value  = this.BuildPlayerStats(kv.Key, matchData),
 					Inline = false
 				});
@@ -74,8 +74,8 @@ namespace Discord.Services {
 			return new AttachmentProperties(fileName, stream);
 		}
 
-		public string BuildPlayerStats(int teamId, IEnumerable<PublicMatchData> players) {
-			PublicMatchData[] team = players.Where(p => p.TeamId == teamId).ToArray();
+		public string BuildPlayerStats(string rosterId, IEnumerable<PublicMatchData> players) {
+			PublicMatchData[] team = players.Where(p => rosterId.Contains(p.PlayerIdEncoded)).ToArray();
 
 			int colPlayer = Math.Max("player#0000".Length,
 									 team.Max(p => LimitPlayerName(p.Player.UniqueDisplayName ?? "").Length)

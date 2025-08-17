@@ -4,9 +4,9 @@ using Shared.Schemas.Supervive.Public;
 
 namespace Shared.Services {
 	public interface ITournamentService {
-		public PublicMatchData[]    SumPlayerStats(PublicMatchData[][]          matchesData);
-		public Dictionary<int, int> CalculateTeamPoints(PublicMatchData[][]     matchesData);
-		public int                  CalculateSinglePlayerPoints(PublicMatchData playerMatchData);
+		public PublicMatchData[]       SumPlayerStats(PublicMatchData[][]          matchesData);
+		public Dictionary<string, int> CalculateTeamPoints(PublicMatchData[][]     matchesData);
+		public int                     CalculateSinglePlayerPoints(PublicMatchData playerMatchData);
 	}
 
 	public class TournamentService :ITournamentService {
@@ -54,22 +54,23 @@ namespace Shared.Services {
 			return data.Values.ToArray();
 		}
 
-		public Dictionary<int, int> CalculateTeamPoints(PublicMatchData[][] matchesData) {
-			Dictionary<int, int> teamPoints = [];
+		public Dictionary<string, int> CalculateTeamPoints(PublicMatchData[][] matchesData) {
+			Dictionary<string, int> teamPoints = [];
 
 			foreach (PublicMatchData[] match in matchesData) {
 				foreach (IGrouping<int, PublicMatchData> teamGroup in match.GroupBy(p => p.TeamId)) {
-					int teamId = teamGroup.Key;
-
+					IEnumerable<string> sortedPlayerIds = teamGroup.Select(p => p.PlayerIdEncoded);
+					string              rosterKey       = string.Join('|', sortedPlayerIds);
+					
 					// Placement is the same for every player of a team in a match
 					int placement    = teamGroup.First().Placement;
 					int placementPts = this.positionPoints.GetValueOrDefault(placement, 0);
 
 					// Ensure team exists, then accumulate placement + player points
-					teamPoints.TryAdd(teamId, 0);
-					teamPoints[teamId] += placementPts;
+					teamPoints.TryAdd(rosterKey, 0);
+					teamPoints[rosterKey] += placementPts;
 
-					teamPoints[teamId] += teamGroup.Sum(this.CalculateSinglePlayerPoints);
+					teamPoints[rosterKey] += teamGroup.Sum(this.CalculateSinglePlayerPoints);
 				}
 			}
 
