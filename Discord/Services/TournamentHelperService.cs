@@ -6,14 +6,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 using NetCord.Rest;
 
+using Shared.Schemas;
 using Shared.Schemas.Supervive.Public;
 using Shared.Services;
 
 namespace Discord.Services {
 	public interface ITournamentHelperService {
-		public EmbedProperties      BuildTournamentResultEmbed(Dictionary<string, int>    placementData, PublicMatchData[] matchData, int topTeams = 3);
-		public AttachmentProperties BuildTournamentResultCsv(IEnumerable<PublicMatchData> matchData);
-		public string               BuildPlayerStats(string                               rosterId, IEnumerable<PublicMatchData> players);
+		public EmbedProperties      BuildTournamentResultEmbed(IEnumerable<RosterResult> rosters, int topTeams = 3);
+		public AttachmentProperties BuildTournamentResultCsv(IEnumerable<RosterResult>   rosters);
 	}
 
 	public class TournamentHelperService(ITournamentService tournamentService) :ITournamentHelperService {
@@ -21,19 +21,23 @@ namespace Discord.Services {
 			services.AddScoped<ITournamentHelperService, TournamentHelperService>();
 		}
 
-		public EmbedProperties BuildTournamentResultEmbed(Dictionary<string, int> placementData, PublicMatchData[] matchData, int topTeams = 3) {
+		public EmbedProperties BuildTournamentResultEmbed(IEnumerable<RosterResult> rosters, int topTeams = 3) {
 			List<EmbedFieldProperties> fields = [];
+			int                        rank   = 1;
 
-			foreach (KeyValuePair<string, int> kv in placementData.OrderByDescending(kv => kv.Value)) {
+			foreach (RosterResult roster in rosters.OrderByDescending(r => r.Points)) {
+				string placementsStr = roster.Placements.Count == 0
+					? "-"
+					: string.Join(", ", roster.Placements.Select(p => $"{p}º"));
+
 				fields.Add(new EmbedFieldProperties {
-					Name   = $"#{fields.Count + 1}: {kv.Value}pts",
-					Value  = this.BuildPlayerStats(kv.Key, matchData),
+					Name   = $"#{rank}: {placementsStr} - {roster.Points}pts",
+					Value  = this.BuildPlayerStats(roster.Players.Values),
 					Inline = false
 				});
 
-				if (fields.Count >= topTeams) break;
+				if (rank++ >= topTeams) break;
 			}
-
 
 			return new EmbedProperties {
 				Color = Colors.DefaultGreen,
@@ -45,7 +49,7 @@ namespace Discord.Services {
 			};
 		}
 
-		public AttachmentProperties BuildTournamentResultCsv(IEnumerable<PublicMatchData> matchData) {
+		public AttachmentProperties BuildTournamentResultCsv(IEnumerable<RosterResult> rosters) {
 			const string fileName = "resultado.csv";
 			const string header   = "Team\tPlayer\tScore\tKills\tDeaths\tAssists\tHealingGiven\tHealingSelf\tDamageDone\tDamageTaken";
 
@@ -55,18 +59,23 @@ namespace Discord.Services {
 
 			writer.WriteLine(header);
 
-			foreach (PublicMatchData player in matchData)
-				writer.WriteLine(string.Join('\t',
-											 player.TeamId,
-											 player.Player.UniqueDisplayName,
-											 tournamentService.CalculateSinglePlayerPoints(player),
-											 player.Stats.Kills,
-											 player.Stats.Deaths,
-											 player.Stats.Assists,
-											 player.Stats.HealingGiven,
-											 player.Stats.HealingGivenSelf,
-											 player.Stats.HeroEffectiveDamageDone,
-											 player.Stats.HeroEffectiveDamageTaken));
+			foreach (RosterResult roster in rosters) {
+				string teamKey = string.Join('|', roster.CanonicalMemberIds.OrderBy(id => id));
+
+				foreach (PublicMatchData p in roster.Players.Values) {
+					writer.WriteLine(string.Join('\t',
+												 teamKey,
+												 p.Player.DisplayName,
+												 p.Stats.Kills,
+												 p.Stats.Kills,
+												 p.Stats.Deaths,
+												 p.Stats.Assists,
+												 p.Stats.HealingGiven,
+												 p.Stats.HealingGivenSelf,
+												 p.Stats.HeroEffectiveDamageDone,
+												 p.Stats.HeroEffectiveDamageTaken));
+				}
+			}
 
 			writer.Flush();
 			stream.Position = 0; // rewind for the consumer
@@ -74,8 +83,8 @@ namespace Discord.Services {
 			return new AttachmentProperties(fileName, stream);
 		}
 
-		public string BuildPlayerStats(string rosterId, IEnumerable<PublicMatchData> players) {
-			PublicMatchData[] team = players.Where(p => rosterId.Contains(p.PlayerIdEncoded)).ToArray();
+		public string BuildPlayerStats(IEnumerable<PublicMatchData> players) {
+			PublicMatchData[] team = players.OrderByDescending(p => p.Stats.Kills).ToArray();
 
 			int colPlayer = Math.Max("player#0000".Length,
 									 team.Max(p => LimitPlayerName(p.Player.UniqueDisplayName ?? "").Length)
