@@ -5,6 +5,7 @@ using Discord.Util;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 
+using Shared.Schemas;
 using Shared.Schemas.Supervive;
 using Shared.Schemas.Supervive.Private;
 using Shared.Schemas.Supervive.Public;
@@ -55,12 +56,11 @@ namespace Discord.Commands {
 														await supervive.GetMatch(m.Split('-')[0], string.Join('-', m.Split('-').TakeLast(5))))
 											.ToArray());
 
-			Dictionary<string, int> placement         = tournament.CalculateTeamPoints(matches);
-			PublicMatchData[]       summedPlayerStats = tournament.SumPlayerStats(matches);
+			IReadOnlyDictionary<string, RosterResult> rosters = tournament.AggregateRosters(matches, minOverlap: 2);
 
 			await this.ModifyResponseAsync(m => {
-				m.Embeds = [tournamentHelper.BuildTournamentResultEmbed(placement, summedPlayerStats, topTeams)];
-				if (attachData) m.Attachments = [tournamentHelper.BuildTournamentResultCsv(summedPlayerStats)];
+				m.Embeds = [tournamentHelper.BuildTournamentResultEmbed(rosters.Values, topTeams)];
+				if (attachData) m.Attachments = [tournamentHelper.BuildTournamentResultCsv(rosters.Values)];
 			});
 		}
 	}
