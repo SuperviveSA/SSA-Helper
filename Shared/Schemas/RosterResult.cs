@@ -7,5 +7,5 @@ public record RosterResult {
 	public          HashSet<string>                     CanonicalMemberIds { get; } = [];
 	public          List<int>                           Placements         { get; } = [];
 	public          int                                 Points             { get; set; }
-	public          Dictionary<string, PublicMatchData> Players            { get; } = new();
+	public          Dictionary<string, PublicMatchData> Players            { get; } = [];
 }

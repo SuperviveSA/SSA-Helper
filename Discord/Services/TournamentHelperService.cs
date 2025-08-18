@@ -8,7 +8,6 @@ using NetCord.Rest;
 
 using Shared.Schemas;
 using Shared.Schemas.Supervive.Public;
-using Shared.Services;
 
 namespace Discord.Services {
 	public interface ITournamentHelperService {
@@ -16,7 +15,7 @@ namespace Discord.Services {
 		public AttachmentProperties BuildTournamentResultCsv(IEnumerable<RosterResult>   rosters);
 	}
 
-	public class TournamentHelperService(ITournamentService tournamentService) :ITournamentHelperService {
+	public class TournamentHelperService :ITournamentHelperService {
 		public static void ConfigureService(IServiceCollection services) {
 			services.AddScoped<ITournamentHelperService, TournamentHelperService>();
 		}

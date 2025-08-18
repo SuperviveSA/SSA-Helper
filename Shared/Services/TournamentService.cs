@@ -59,7 +59,7 @@ namespace Shared.Services {
 
 		public IReadOnlyDictionary<string, RosterResult> AggregateRosters(PublicMatchData[][] matchesData, int minOverlap = 2) {
 			List<RosterResult>               rosters = [];
-			Dictionary<string, RosterResult> byId    = new();
+			Dictionary<string, RosterResult> byId    = [];
 
 			foreach (PublicMatchData[] match in matchesData) {
 				foreach (IGrouping<int, PublicMatchData> teamGroup in match.GroupBy(p => p.TeamId)) {
@@ -99,7 +99,7 @@ namespace Shared.Services {
 			RosterResult? best      = null;
 			int           bestMatch = 0;
 
-			HashSet<string> current = new(memberIdsSorted);
+			HashSet<string> current = [..memberIdsSorted];
 
 			foreach (RosterResult roster in rosters) {
 				int overlap = roster.CanonicalMemberIds.Count(id => current.Contains(id));
